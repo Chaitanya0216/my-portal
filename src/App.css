@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* --- 1. THEME VARIABLES (Based on your Image) --- */
+:root {
+  /* Default is Dark Mode because it looks cooler */
+  --bg-main: #13131f;       /* Very dark blue/black */
+  --bg-sidebar: #1c1c2e;    /* Slightly lighter purple/blue */
+  --bg-widget: #27273e;     /* The card background */
+  --text-main: #ffffff;
+  --text-muted: #a0a0b0;
+  --accent: #6c5ce7;        /* Purple Accent */
+  --accent-secondary: #00cec9; /* Cyan Accent */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light Mode Overrides (Optional) */
+.app-container:not(.dark-mode) {
+  --bg-main: #f0f2f5;
+  --bg-sidebar: #ffffff;
+  --bg-widget: #ffffff;
+  --text-main: #2d3436;
+  --text-muted: #636e72;
+  --glass-border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* --- 2. LAYOUT --- */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  overflow: hidden;
+}
+
+/* --- 3. SIDEBAR --- */
+.sidebar {
+  width: 260px;
+  background-color: var(--bg-sidebar);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  border-right: var(--glass-border);
+}
+.sidebar h2 { margin-bottom: 40px; color: var(--accent-secondary); letter-spacing: 1px; }
+
+.sidebar button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 15px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+.sidebar button:hover, .sidebar button.active {
+  background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
+  color: white;
+  padding-left: 20px; /* Slide effect */
+}
+
+/* --- 4. MAIN AREA --- */
+.main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.header {
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.theme-btn {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--text-main);
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.content-area { padding: 30px 40px; overflow-y: auto; height: 100%; }
+
+/* --- 5. DASHBOARD GRID (The Layout from your image) --- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Auto columns */
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.welcome-banner { margin-bottom: 20px; }
+.welcome-banner h2 { font-size: 28px; margin-bottom: 5px; }
+.quote { color: var(--accent-secondary); font-style: italic; font-size: 14px; }
+
+/* WIDGET STYLES */
+.widget-card, .stat-card {
+  background-color: var(--bg-widget);
+  padding: 25px;
+  border-radius: 15px;
+  border: var(--glass-border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.widget-col { display: flex; flex-direction: column; gap: 20px; }
+
+.stat-card { cursor: pointer; transition: transform 0.2s; text-align: center;}
+.stat-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+.stat-card .number { font-size: 40px; font-weight: bold; color: var(--text-main); }
+.stat-card h3 { color: var(--text-muted); font-size: 14px; }
+
+/* Links Grid */
+.links-widget h3, .notes-widget h3 { margin-bottom: 15px; font-size: 16px; color: var(--text-muted); }
+.links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.link-btn {
+  display: block;
+  padding: 15px;
+  text-align: center;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-main);
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+.link-btn:hover { background: var(--accent); }
+
+/* Scratchpad */
+.notes-widget textarea {
+  width: 100%;
+  height: 150px;
+  background: rgba(0,0,0,0.2);
+  border: none;
+  color: var(--text-main);
+  padding: 15px;
+  border-radius: 10px;
+  resize: none;
+}
+.notes-widget textarea:focus { outline: 1px solid var(--accent); }
+
+/* Old Components Fixes */
+.task-container, .video-container { background: var(--bg-widget); padding: 25px; border-radius: 15px; }
+.input-group input { background: rgba(0,0,0,0.2); border: none; color: white; padding: 12px; }
+.add-btn { background: var(--accent); border: none; color: white; padding: 0 20px; cursor: pointer; border-radius: 5px; }
