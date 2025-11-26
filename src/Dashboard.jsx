@@ -1,64 +1,73 @@
 import { useState, useEffect } from 'react';
+import TaskManager from './TaskManager';
 
 function Dashboard({ setActiveTab }) {
-  // --- 1. STATS & EFFICIENCY LOGIC ---
-  const [stats, setStats] = useState({ 
-    total: 0, 
-    pending: 0, 
-    done: 0, 
-    efficiency: 0 
-  });
+  // --- STATS LOGIC ---
+  const [stats, setStats] = useState({ efficiency: 0, done: 0, pending: 0 });
   
   useEffect(() => {
     const tasks = JSON.parse(localStorage.getItem("myTasks") || "[]");
-    const videos = JSON.parse(localStorage.getItem("myVideos") || "[]");
-    
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(t => t.done).length;
-    const efficiencyScore = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
-
-    setStats({
-      total: totalTasks,
-      pending: tasks.filter(t => !t.done).length,
-      videoCount: videos.length,
-      efficiency: efficiencyScore
-    });
+    const total = tasks.length;
+    const done = tasks.filter(t => t.status === 'done').length;
+    const efficiency = total === 0 ? 0 : Math.round((done / total) * 100);
+    setStats({ efficiency, done, pending: total - done });
   }, []);
 
-  // --- 2. DAILY QUOTE LOGIC ---
-  const [quote, setQuote] = useState("");
-  const quotes = [
-    "The only way to do great work is to love what you do.",
-    "Discipline is doing what needs to be done, even if you don't want to.",
-    "Code is like humor. When you have to explain it, it’s bad.",
-    "Your future is created by what you do today, not tomorrow.",
-    "Dream big. Work hard. Stay humble."
-  ];
+  // --- EDITABLE SCHEDULE LOGIC (New!) ---
+  const [schedule, setSchedule] = useState(() => {
+    const saved = localStorage.getItem("mySchedule");
+    // Default Plan if nothing is saved
+    return saved ? JSON.parse(saved) : [
+      { time: "09:00", activity: "Code 💻", type: "work" },
+      { time: "13:00", activity: "Lunch 🍔", type: "break" }
+    ];
+  });
+
+  const [newPlan, setNewPlan] = useState({ time: "", activity: "", type: "work" });
 
   useEffect(() => {
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-    setQuote(randomQuote);
-  }, []);
+    localStorage.setItem("mySchedule", JSON.stringify(schedule));
+  }, [schedule]);
 
-  // --- 3. SCRATCHPAD LOGIC ---
-  const [note, setNote] = useState(() => localStorage.getItem("quickNote") || "");
-  const handleNoteChange = (e) => {
-    setNote(e.target.value);
-    localStorage.setItem("quickNote", e.target.value);
+  const addPlan = () => {
+    if (!newPlan.time || !newPlan.activity) return;
+    setSchedule([...schedule, newPlan]);
+    setNewPlan({ time: "", activity: "", type: "work" }); // Reset inputs
+  };
+
+  const deletePlan = (indexToDelete) => {
+    setSchedule(schedule.filter((_, index) => index !== indexToDelete));
   };
 
   return (
-    <div className="dashboard-container">
-      <div className="welcome-banner">
-        <h2>🚀 Mission Control</h2>
-        <p className="quote">"{quote}"</p>
+    <div className="dashboard-layout">
+      
+      {/* LEFT SIDE: KANBAN */}
+      <div className="main-board-section">
+        <div className="section-header">
+            <h2>Task Management</h2>
+            <p className="subtitle">Track your progress</p>
+        </div>
+        <TaskManager />
       </div>
 
-      <div className="dashboard-grid">
+      {/* RIGHT SIDE: WIDGETS */}
+      <div className="sidebar-widgets">
         
-        {/* WIDGET 1: EFFICIENCY CHART */}
+        {/* 1. PROFILE */}
+        <div className="widget-card profile-widget">
+            <div className="profile-header">
+                <div>
+                    <h3>Chandu</h3>
+                    <p>CSE Student</p>
+                </div>
+                <div className="profile-icon">👨‍💻</div>
+            </div>
+        </div>
+
+        {/* 2. EFFICIENCY */}
         <div className="widget-card efficiency-widget">
-            <h3>📊 Efficiency</h3>
+            <h3>Efficiency</h3>
             <div className="chart-container">
                 <svg viewBox="0 0 36 36" className="circular-chart">
                     <path className="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -69,33 +78,53 @@ function Dashboard({ setActiveTab }) {
                     <text x="18" y="20.35" className="percentage">{stats.efficiency}%</text>
                 </svg>
             </div>
-            <div className="mini-stats">
-                <span>✅ {stats.done} Done</span>
-                <span>⏳ {stats.pending} Pending</span>
-            </div>
         </div>
 
-        {/* WIDGET 2: QUICK ACTIONS */}
-        <div className="widget-card links-widget">
-            <h3>🔗 Quick Access</h3>
-            <div className="links-grid">
-                <a href="https://github.com" target="_blank" className="link-btn github">GitHub</a>
-                <a href="https://chatgpt.com" target="_blank" className="link-btn chatgpt">ChatGPT</a>
-                <a href="https://mail.google.com" target="_blank" className="link-btn gmail">Gmail</a>
-                <div onClick={() => setActiveTab('playlist')} className="link-btn video-link" style={{cursor: 'pointer'}}>
-                    📺 Saved Videos ({stats.videoCount})
-                </div>
+        {/* 3. EDITABLE PLAN */}
+        <div className="widget-card schedule-widget">
+            <h3>Plan Your Day</h3>
+            
+            {/* Input Area */}
+            <div className="plan-input-row">
+                <input 
+                    type="time" 
+                    value={newPlan.time}
+                    onChange={(e) => setNewPlan({...newPlan, time: e.target.value})}
+                    className="mini-input"
+                />
+                <input 
+                    type="text" 
+                    placeholder="Activity..." 
+                    value={newPlan.activity} 
+                    onChange={(e) => setNewPlan({...newPlan, activity: e.target.value})}
+                    className="mini-input grow"
+                />
+                <select 
+                    value={newPlan.type} 
+                    onChange={(e) => setNewPlan({...newPlan, type: e.target.value})}
+                    className="mini-select"
+                >
+                    <option value="work">🟣</option>
+                    <option value="school">🔵</option>
+                    <option value="break">🟡</option>
+                    <option value="health">🔴</option>
+                </select>
+                <button onClick={addPlan} className="mini-add-btn">+</button>
             </div>
-        </div>
 
-        {/* WIDGET 3: SCRATCHPAD */}
-        <div className="widget-card notes-widget">
-            <h3>💡 Scratchpad</h3>
-            <textarea 
-                placeholder="Paste code snippets here..."
-                value={note}
-                onChange={handleNoteChange}
-            ></textarea>
+            {/* The List */}
+            <div className="schedule-list">
+                {schedule.map((item, index) => (
+                    <div key={index} className={`schedule-item ${item.type}`}>
+                        <div>
+                            <span className="time">{item.time}</span>
+                            <div className="activity">{item.activity}</div>
+                        </div>
+                        <button onClick={() => deletePlan(index)} className="mini-delete-btn">×</button>
+                    </div>
+                ))}
+                {schedule.length === 0 && <p className="subtitle" style={{textAlign:'center', marginTop:10}}>No plan yet.</p>}
+            </div>
         </div>
 
       </div>

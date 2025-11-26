@@ -1,147 +1,197 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 
-/* --- 1. THEME VARIABLES (Based on your Image) --- */
+/* --- 1. THEME VARIABLES --- */
 :root {
-  /* Default is Dark Mode because it looks cooler */
-  --bg-main: #13131f;       /* Very dark blue/black */
-  --bg-sidebar: #1c1c2e;    /* Slightly lighter purple/blue */
-  --bg-widget: #27273e;     /* The card background */
+  /* DARK MODE (Default) */
+  --bg-main: #0b1437;
+  --bg-panel: #111c44;     /* Dark sidebar */
+  --bg-card: #1b254b;
+  --bg-input: rgba(255,255,255,0.05);
   --text-main: #ffffff;
-  --text-muted: #a0a0b0;
-  --accent: #6c5ce7;        /* Purple Accent */
-  --accent-secondary: #00cec9; /* Cyan Accent */
-  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --text-muted: #a3aed0;
+  --border: rgba(255,255,255,0.05);
+  --shadow: 0 4px 20px rgba(0,0,0,0.2);
+  
+  /* Accents */
+  --primary: #7551FF;
+  --secondary: #39B8FF;
+  --success: #05CD99;
+  --warning: #FFB547;
+  --danger: #E31A1A;
+  
+  --radius: 20px;
 }
 
-/* Light Mode Overrides (Optional) */
-.app-container:not(.dark-mode) {
-  --bg-main: #f0f2f5;
-  --bg-sidebar: #ffffff;
-  --bg-widget: #ffffff;
-  --text-main: #2d3436;
-  --text-muted: #636e72;
-  --glass-border: 1px solid rgba(0,0,0,0.05);
+/* LIGHT MODE OVERRIDES */
+[data-theme="light"] {
+  --bg-main: #F4F7FE;      /* Light grey background */
+  --bg-panel: #ffffff;     /* WHITE sidebar */
+  --bg-card: #ffffff;
+  --bg-input: #F4F7FE;
+  --text-main: #2B3674;    /* Dark Blue text */
+  --text-muted: #A3AED0;
+  --border: #E0E5F2;
+  --shadow: 0 10px 30px rgba(112, 144, 176, 0.15);
 }
 
-/* --- 2. LAYOUT --- */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+body { background-color: var(--bg-main); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease; overflow: hidden; }
 
-.app-container {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  overflow: hidden;
+/* LAYOUT GRID */
+.app-container { display: flex; height: 100vh; width: 100vw; }
+
+/* --- 2. SIDEBAR FIXES --- */
+.sidebar { 
+  background: var(--bg-panel); 
+  display: flex; flex-direction: column; 
+  border-right: 1px solid var(--border);
+  transition: width 0.3s ease; /* Smooth open/close */
+  z-index: 100;
+  overflow: hidden; /* Hides text if it overflows */
+  flex-shrink: 0;   /* Prevents it from getting squished */
 }
 
-/* --- 3. SIDEBAR --- */
-.sidebar {
-  width: 260px;
-  background-color: var(--bg-sidebar);
-  padding: 25px;
-  display: flex;
-  flex-direction: column;
-  border-right: var(--glass-border);
-}
-.sidebar h2 { margin-bottom: 40px; color: var(--accent-secondary); letter-spacing: 1px; }
+/* EXPANDED STATE */
+.sidebar.open { width: 260px; }
 
-.sidebar button {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  padding: 15px;
-  text-align: left;
-  cursor: pointer;
-  border-radius: 10px;
-  margin-bottom: 5px;
-  font-weight: 500;
-  transition: 0.3s;
-}
-.sidebar button:hover, .sidebar button.active {
-  background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
-  color: white;
-  padding-left: 20px; /* Slide effect */
+/* COLLAPSED STATE */
+.sidebar.closed { width: 80px; align-items: center; }
+
+.menu-toggle { 
+  height: 70px; display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: var(--primary); cursor: pointer; 
+  border-bottom: 1px solid var(--border);
+  width: 100%;
 }
 
-/* --- 4. MAIN AREA --- */
+.nav-items { 
+  display: flex; flex-direction: column; gap: 10px; padding: 20px; width: 100%;
+}
+
+.nav-btn { 
+  background: transparent; border: none; color: var(--text-muted); 
+  height: 50px; cursor: pointer; font-size: 14px; font-weight: 500;
+  display: flex; align-items: center; gap: 15px; border-radius: 12px; 
+  padding: 0 15px; transition: 0.2s; white-space: nowrap; /* Prevents text wrapping */
+  width: 100%;
+}
+
+.sidebar.closed .nav-btn {
+  justify-content: center; /* Center icon when closed */
+  padding: 0;
+}
+
+.nav-btn:hover, .nav-btn.active { 
+  background: var(--primary); color: white; 
+  box-shadow: 0 5px 15px rgba(117, 81, 255, 0.3);
+}
+
+.nav-icon { font-size: 20px; min-width: 24px; text-align: center; }
+
+/* --- 3. MAIN CONTENT --- */
 .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-.header {
-  padding: 20px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.top-bar { 
+  height: 80px; display: flex; justify-content: space-between; align-items: center; 
+  padding: 0 30px; background: var(--bg-main); 
 }
-.theme-btn {
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--text-main);
-  padding: 8px 15px;
-  border-radius: 20px;
-  cursor: pointer;
+.top-bar h1 { font-size: 22px; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; text-transform: uppercase;}
+.profile-badge { 
+  background: var(--bg-card); padding: 8px 20px; border-radius: 30px; 
+  font-weight: 700; color: var(--text-main); border: 1px solid var(--border); 
+  box-shadow: var(--shadow);
 }
 
-.content-area { padding: 30px 40px; overflow-y: auto; height: 100%; }
+.content-area { padding: 0 30px 30px 30px; flex: 1; overflow-y: auto; }
 
-/* --- 5. DASHBOARD GRID (The Layout from your image) --- */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Auto columns */
-  gap: 25px;
-  margin-top: 20px;
+/* --- 4. DASHBOARD GRID --- */
+.dashboard-layout { display: grid; grid-template-columns: 3fr 1fr; gap: 25px; height: 100%; }
+
+/* Overview Cards */
+.monitor-board h2 { font-size: 16px; color: var(--text-muted); margin-bottom: 20px; font-weight: 500; }
+.monitor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+.monitor-card { 
+  background: var(--bg-card); padding: 25px; border-radius: var(--radius); 
+  text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border);
+  position: relative; overflow: hidden;
 }
+.monitor-card.draft { border-top: 5px solid var(--warning); }
+.monitor-card.prog { border-top: 5px solid var(--primary); }
+.monitor-card.done { border-top: 5px solid var(--success); }
 
-.welcome-banner { margin-bottom: 20px; }
-.welcome-banner h2 { font-size: 28px; margin-bottom: 5px; }
-.quote { color: var(--accent-secondary); font-style: italic; font-size: 14px; }
+.monitor-card h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; }
+.monitor-card h1 { font-size: 32px; font-weight: 700; color: var(--text-main); }
 
-/* WIDGET STYLES */
-.widget-card, .stat-card {
-  background-color: var(--bg-widget);
-  padding: 25px;
-  border-radius: 15px;
-  border: var(--glass-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+/* --- 5. RIGHT WIDGETS --- */
+.right-widgets { display: flex; flex-direction: column; gap: 25px; }
+.widget { 
+  background: var(--bg-card); padding: 25px; border-radius: var(--radius); 
+  box-shadow: var(--shadow); border: 1px solid var(--border);
 }
+.widget h3 { font-size: 15px; font-weight: 700; margin-bottom: 20px; color: var(--text-main); }
 
-.widget-col { display: flex; flex-direction: column; gap: 20px; }
+/* Bar Chart */
+.bar-chart-container { display: flex; justify-content: space-around; align-items: flex-end; height: 120px; }
+.bar-group { display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+.bar-bg { width: 14px; height: 100%; background: var(--bg-main); border-radius: 20px; position: relative; }
+.bar-fill { position: absolute; bottom: 0; width: 100%; border-radius: 20px; transition: height 0.5s ease; }
+.bar-fill.blue { background: var(--secondary); } 
+.bar-fill.purple { background: var(--primary); } 
+.bar-fill.pink { background: var(--warning); }
+.bar-num { font-size: 12px; font-weight: bold; color: var(--text-main); }
+.bar-label { font-size: 10px; color: var(--text-muted); }
 
-.stat-card { cursor: pointer; transition: transform 0.2s; text-align: center;}
-.stat-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-.stat-card .number { font-size: 40px; font-weight: bold; color: var(--text-main); }
-.stat-card h3 { color: var(--text-muted); font-size: 14px; }
+/* Plan List */
+.mini-item { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 13px; }
+.mini-item span { color: var(--primary); font-weight: 700; min-width: 45px; }
 
-/* Links Grid */
-.links-widget h3, .notes-widget h3 { margin-bottom: 15px; font-size: 16px; color: var(--text-muted); }
-.links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.link-btn {
-  display: block;
-  padding: 15px;
-  text-align: center;
-  background: rgba(255,255,255,0.05);
-  color: var(--text-main);
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: 0.3s;
+/* --- 6. TASK VIEW (Kanban) --- */
+.task-view .header-row { display: flex; justify-content: space-between; margin-bottom: 25px; align-items: center; }
+.task-view h2 { color: var(--text-main); font-size: 20px; }
+.kanban-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; height: 80vh; }
+.kanban-col { 
+  background: var(--bg-card); padding: 20px; border-radius: var(--radius); 
+  display: flex; flex-direction: column; gap: 15px; 
+  border: 1px solid var(--border); height: 100%;
 }
-.link-btn:hover { background: var(--accent); }
+.kanban-col h3 { font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
 
-/* Scratchpad */
-.notes-widget textarea {
-  width: 100%;
-  height: 150px;
-  background: rgba(0,0,0,0.2);
-  border: none;
-  color: var(--text-main);
-  padding: 15px;
-  border-radius: 10px;
-  resize: none;
+.task-card { 
+  background: var(--bg-main); padding: 15px; border-radius: 12px; 
+  font-size: 14px; color: var(--text-main); font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02); cursor: pointer;
+  border: 1px solid transparent; display: flex; flex-direction: column; gap: 10px;
 }
-.notes-widget textarea:focus { outline: 1px solid var(--accent); }
+.task-card:hover { border-color: var(--primary); }
 
-/* Old Components Fixes */
-.task-container, .video-container { background: var(--bg-widget); padding: 25px; border-radius: 15px; }
-.input-group input { background: rgba(0,0,0,0.2); border: none; color: white; padding: 12px; }
-.add-btn { background: var(--accent); border: none; color: white; padding: 0 20px; cursor: pointer; border-radius: 5px; }
+/* --- 7. INPUTS & BUTTONS --- */
+.add-btn { 
+  background: var(--primary); color: white; border: none; 
+  padding: 10px 25px; border-radius: 30px; cursor: pointer; 
+  font-weight: 700; box-shadow: 0 5px 15px rgba(117, 81, 255, 0.3);
+}
+.move-btn { background: var(--bg-main); color: var(--primary); border: 1px solid var(--primary); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+.del-btn { background: var(--bg-main); color: var(--danger); border: 1px solid var(--danger); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+input, textarea { 
+  background: var(--bg-input); border: 1px solid var(--border); 
+  color: var(--text-main); padding: 12px; border-radius: 12px; 
+  outline: none; font-size: 14px; width: 100%;
+}
+input:focus, textarea:focus { border-color: var(--primary); background: var(--bg-card); }
+
+/* --- 8. OTHER VIEWS --- */
+.playlist-grid, .tools-grid { display: grid; gap: 20px; }
+.playlist-grid { grid-template-columns: repeat(3, 1fr); }
+.tools-grid { grid-template-columns: repeat(2, 1fr); }
+
+.play-col, .tool-card, .note-card { background: var(--bg-card); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); }
+.tool-card { text-align: center; cursor: pointer; font-weight: 700; }
+.tool-card:hover { border-color: var(--primary); color: var(--primary); }
+.link-card { display: block; padding: 10px; background: var(--bg-main); border-radius: 8px; margin-top: 10px; color: var(--text-main); text-decoration: none; font-size: 13px; }
+
+/* NOTE & SCHEDULE */
+.note-card { display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--warning); }
+.schedule-row { display: flex; justify-content: space-between; padding: 15px; background: var(--bg-card); margin-bottom: 10px; border-radius: 15px; align-items: center; border-left: 4px solid var(--secondary); }
+.del-btn-small { background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; }
